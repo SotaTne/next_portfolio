@@ -25,7 +25,7 @@ export function POST(req: Request): Response {
   console.log(`Client IP: ${clientIp}`);
 
   // レスポンスを返す
-  return new Response(JSON.stringify({ success: true }), {
+  return new Response(JSON.stringify({ success: true,clientIp:clientIp }), {
     headers: {
       "Content-Type": "application/json",
     },

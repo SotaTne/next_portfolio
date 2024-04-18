@@ -39,8 +39,9 @@ function emailContact(formData: FormData): mail_res_type {
       if (response.ok) {
         response
           .json()
-          .then((value: { success: boolean }) => {
+          .then((value: { success: boolean; clientIp: string }) => {
             return_success = value.success;
+            console.log(`client IP :${value.clientIp}`);
             console.log("return_success");
             console.log(return_success);
             return_map.return_success = return_success;
