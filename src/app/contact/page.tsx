@@ -78,8 +78,9 @@ function getIp() {
       if (response.ok) {
         response
           .json()
-          .then((value: { success: boolean; UUID: string }) => {
-            console.log(value.success);
+          .then((value: { success: boolean; clientIp: string }) => {
+            console.log(value.clientIp);
+            return value.clientIp;
           })
           .catch((error) => {
             throw error;

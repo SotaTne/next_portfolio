@@ -21,11 +21,11 @@ export function POST(req: Request): Response {
   };
 
   // クライアントのIPアドレスを取得
-  const clientIp = getClientIp(req);
+  const clientIp = getClientIp(req) || "";
   console.log(`Client IP: ${clientIp}`);
 
   // レスポンスを返す
-  return new Response(JSON.stringify({ success: true,clientIp:clientIp }), {
+  return new Response(JSON.stringify({ success: true, clientIp: clientIp }), {
     headers: {
       "Content-Type": "application/json",
     },
