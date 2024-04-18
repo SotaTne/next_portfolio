@@ -35,6 +35,6 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     "src/app/contact/failure/page.tsx"
-  ],
+, "src/middleware.js"  ],
   "exclude": ["node_modules"]
 }

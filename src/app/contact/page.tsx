@@ -3,8 +3,6 @@
 import Footer from "@/components/Footer";
 import { escapeHTML } from "@/components/funcs/Translator";
 import Header from "@/components/Header";
-import { NextRequest } from "next/server";
-//import { useRouter } from "next/navigation";
 import { FormEvent } from "react";
 
 type mail_res_type = {
@@ -66,8 +64,56 @@ function emailContact(formData: FormData): mail_res_type {
   return return_map;
 }
 
-export default function Page() {
+function getIp() {
+  fetch("/api/get_ip", {
+    method: "POST",
+    mode: "same-origin",
+
+    headers: {
+      "Content-Type": "application/json",
+    },
+  })
+    .then((response) => {
+      if (response.ok) {
+        response
+          .json()
+          .then((value: { success: boolean; UUID: string }) => {
+            console.log(value.success);
+          })
+          .catch((error) => {
+            throw error;
+          });
+      }
+    })
+    .catch((error) => {
+      throw error;
+    });
+}
+
+/*
+function checkRedirect(UUID: string) {
+  fetch("/api/check", {})
+    .then((response) => {
+      if (response.ok) {
+        response
+          .json()
+          .then((value: { success: boolean; UUID: string }) => {
+            console.log(value.success);
+          })
+          .catch((error) => {
+            throw error;
+          });
+      }
+    })
+    .catch((error) => {
+      throw error;
+    });
+}
+*/
+export default function Page({ searchParams: { UUID } }: { searchParams: { UUID: string } }) {
   //const router = useRouter();
+  console.log(UUID);
+  getIp();
   const clickSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault(); //ページのリロードを防ぐ
     const formData = new FormData(e.currentTarget);
@@ -79,6 +125,7 @@ export default function Page() {
       //router.replace(`contact/failure?${params}`);
     }
   };
+
   return (
     <>
       <Header />

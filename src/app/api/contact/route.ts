@@ -4,12 +4,12 @@ import { escapeHTML } from "@/components/funcs/Translator";
 type ResData = { name: string; email: string; contents: string };
 
 export async function POST(req: Request) {
-  console.log("you " + req.headers.get("referer"));
+  const referer = req.headers.get("referer");
   const data: ResData = (await req.json()) as ResData;
   const name: string = escapeHTML(data.name || "");
   const email: string = escapeHTML(data.email || "").replace(/\s+/g, "");
   const contents: string = escapeHTML(data.contents || "");
-
+  const origin = req.headers.get("origin");
   console.log(name);
   console.log(email);
   console.log(contents);
@@ -20,11 +20,13 @@ export async function POST(req: Request) {
         name !== "" &&
         !!name.match(/\S/g) &&
         contents !== "" &&
-        !!contents.match(/\S/g)
+        !!contents.match(/\S/g) &&
+        `${origin}/contact` == referer
       : false;
-  console.log("");
+  console.log("allMatch");
   console.log(allMatch);
-  console.log("");
+  console.log("ref");
+  console.log(referer);
 
   if (allMatch) {
     /*

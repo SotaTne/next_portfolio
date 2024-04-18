@@ -5,7 +5,7 @@ export default function My_Logo(props: {
   return (
     /*
     <Image
-      src="my_logo.svg"
+      src="image/my_logo.svg"
       width={"number" === typeof props.size ? props.size : 36}
       height={"number" === typeof props.size ? (props.size * 2) / 3 : 24}
       alt={"MySiteLogo"}
