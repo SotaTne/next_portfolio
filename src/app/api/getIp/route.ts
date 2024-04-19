@@ -1,4 +1,4 @@
-export function POST(req: Request): Response {
+export function GET(req: Request): Response {
   // クライアントのIPアドレスを取得する関数
   const getClientIp = (req: Request): string | null => {
     const headers = req.headers;
@@ -21,13 +21,13 @@ export function POST(req: Request): Response {
   };
 
   // クライアントのIPアドレスを取得
-  const clientIp = getClientIp(req) || "";
+  const clientIp: string | null = getClientIp(req);
   console.log(`Client IP: ${clientIp}`);
 
   // レスポンスを返す
-  return new Response(JSON.stringify({ success: true, clientIp: clientIp }), {
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
+  if (clientIp) {
+    return Response.json({ success: true, clientIp: clientIp });
+  } else {
+    return Response.json({ success: false, clientIp: "" });
+  }
 }

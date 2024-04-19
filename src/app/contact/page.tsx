@@ -4,6 +4,7 @@ import Footer from "@/components/Footer";
 import { escapeHTML } from "@/components/funcs/Translator";
 import Header from "@/components/Header";
 import { FormEvent } from "react";
+import axios from "axios";
 
 type mail_res_type = {
   return_success: boolean;
@@ -39,9 +40,8 @@ function emailContact(formData: FormData): mail_res_type {
       if (response.ok) {
         response
           .json()
-          .then((value: { success: boolean; clientIp: string }) => {
+          .then((value: { success: boolean }) => {
             return_success = value.success;
-            console.log(`client IP :${value.clientIp}`);
             console.log("return_success");
             console.log(return_success);
             return_map.return_success = return_success;
@@ -65,9 +65,10 @@ function emailContact(formData: FormData): mail_res_type {
   return return_map;
 }
 
+/*
 function getIp() {
-  let return_value = "";
-  fetch("/api/get_ip", {
+  let res_fetch = "";
+  fetch("/api/getIp", {
     method: "POST",
     mode: "same-origin",
 
@@ -80,28 +81,51 @@ function getIp() {
         response
           .json()
           .then((value: { success: boolean; clientIp: string }) => {
-            console.log("vlaue : ");
-            console.log(value);
-            return_value = value.clientIp;
-            console.log("ReturnValue" + return_value);
+            res_fetch = value.clientIp;
           })
           .catch((error) => {
-            console.log("error1");
-            console.log(error);
+            console.log("throwError1");
             throw error;
           });
       }
     })
     .catch((error) => {
-      console.log("error2");
-
+      console.log("throwError2");
       console.log(error);
-      throw error;
+      () => {};
     });
-  console.log("last");
-  return return_value;
+  return res_fetch;
+}
+*/
+async function getIp() {
+  let return_response: { success: boolean; clientIp: string } = {
+    success: false,
+    clientIp: "",
+  };
+  try {
+    return_response = ((await axios.get("/api/getIp")).data as {
+      success: boolean;
+      clientIp: string;
+    }) || { success: false, clientIp: "" };
+    console.log(return_response);
+  } catch (error) {
+    console.log(error);
+  }
+  return return_response;
 }
 
+/*
+function getIp() {
+  axios
+    .get("/api/getIp")
+    .then((value) => {
+      console.log(value);
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+}
+*/
 /*
 function checkRedirect(UUID: string) {
   fetch("/api/check", {})
@@ -122,12 +146,14 @@ function checkRedirect(UUID: string) {
     });
 }
 */
+
 export default function Page({ searchParams: { UUID } }: { searchParams: { UUID: string } }) {
   //const router = useRouter();
-  console.log(UUID);
-  const IP = getIp();
-  console.log(getIp() + "getIpIP");
-  console.log("IP : " + IP);
+  console.log("UUID" + UUID);
+  console.log("ip\n");
+
+  console.log(getIp());
+  console.log("endi\n");
   const clickSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault(); //ページのリロードを防ぐ
     const formData = new FormData(e.currentTarget);
@@ -145,7 +171,6 @@ export default function Page({ searchParams: { UUID } }: { searchParams: { UUID:
       <Header />
       <main>
         <section className="mx-auto flex h-screen w-4/5 flex-col content-center items-center justify-center pt-[86px] md:flex-row md:justify-around">
-          <h1>IP : {IP}</h1>
           <form onSubmit={clickSubmit}>
             <ul>
               <li>
