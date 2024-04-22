@@ -65,39 +65,10 @@ function emailContact(formData: FormData): mail_res_type {
   return return_map;
 }
 
-/*
-function getIp() {
-  let res_fetch = "";
-  fetch("/api/getIp", {
-    method: "POST",
-    mode: "same-origin",
-
-    headers: {
-      "Content-Type": "application/json",
-    },
-  })
-    .then((response) => {
-      if (response.ok) {
-        response
-          .json()
-          .then((value: { success: boolean; clientIp: string }) => {
-            res_fetch = value.clientIp;
-          })
-          .catch((error) => {
-            console.log("throwError1");
-            throw error;
-          });
-      }
-    })
-    .catch((error) => {
-      console.log("throwError2");
-      console.log(error);
-      () => {};
-    });
-  return res_fetch;
-}
-*/
-async function getIp() {
+async function getIp(): Promise<{
+  success: boolean;
+  clientIp: string;
+}> {
   let return_response: { success: boolean; clientIp: string } = {
     success: false,
     clientIp: "",
@@ -107,52 +78,64 @@ async function getIp() {
       success: boolean;
       clientIp: string;
     }) || { success: false, clientIp: "" };
-    console.log(return_response);
   } catch (error) {
+    console.log("thi is error");
     console.log(error);
+    console.log("end error");
   }
   return return_response;
 }
 
-/*
-function getIp() {
-  axios
-    .get("/api/getIp")
-    .then((value) => {
-      console.log(value);
+function setIp(
+  IpMap: Promise<{
+    success: boolean;
+    clientIp: string;
+  }>,
+  UUID: string,
+) {
+  let returnBoolean = false;
+  IpMap.then((ipMap) => {
+    fetch("/api/setData", {
+      method: "POST",
+      mode: "same-origin",
+
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        UUID: UUID,
+        ip: ipMap.success ? "" : ipMap.clientIp,
+      }),
     })
-    .catch((error) => {
-      console.log(error);
-    });
+      .then((value) => {
+        if (value.ok) {
+          value
+            .json()
+            .then((response: { success: boolean }) => {
+              returnBoolean = response.success;
+            })
+            .catch((rew_error) => {
+              throw rew_error;
+            });
+        }
+      })
+      .catch((error) => {
+        throw error;
+      });
+  }).catch((error) => {
+    throw error;
+  });
+  return returnBoolean;
 }
-*/
-/*
-function checkRedirect(UUID: string) {
-  fetch("/api/check", {})
-    .then((response) => {
-      if (response.ok) {
-        response
-          .json()
-          .then((value: { success: boolean; UUID: string }) => {
-            console.log(value.success);
-          })
-          .catch((error) => {
-            throw error;
-          });
-      }
-    })
-    .catch((error) => {
-      throw error;
-    });
-}
-*/
 
 export default function Page({ searchParams: { UUID } }: { searchParams: { UUID: string } }) {
   //const router = useRouter();
   console.log("UUID" + UUID);
   console.log("ip\n");
+  const Data_getIp = { clientIp: "", success: false };
+  const PromiseIP = getIp();
+  setIp(PromiseIP, UUID);
 
-  console.log(getIp());
   console.log("endi\n");
   const clickSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault(); //ページのリロードを防ぐ
