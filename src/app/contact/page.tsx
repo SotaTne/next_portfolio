@@ -1,205 +1,191 @@
-"use client";
+'use client';
 
-import Footer from "@/components/Footer";
-import { escapeHTML } from "@/components/funcs/Translator";
-import Header from "@/components/Header";
-import { FormEvent } from "react";
-import axios from "axios";
+import Footer from '@/components/Footer';
+import Header from '@/components/Header';
+import { escapeHTML } from '@/components/funcs/Translator';
+import { generateUUIDv4 } from '@/components/funcs/uuid';
+import { redirect } from 'next/navigation';
+import { FormEvent, useEffect, useState } from 'react';
 
-type mail_res_type = {
+type MailResType = {
   return_success: boolean;
   response_status: number;
   params: { email: string; name: string; contents: string };
 };
 
-function emailContact(formData: FormData): mail_res_type {
-  const name: string = escapeHTML((formData.get("name") as string) || "");
-  const email: string = escapeHTML((formData.get("email") as string) || "").replace(/\s+/g, "");
-  const contents: string = escapeHTML((formData.get("contents") as string) || "");
-  console.log(name, email, contents);
-  let return_success: boolean = false;
-  const return_map: mail_res_type = {
-    return_success: return_success,
-    response_status: 0,
-    params: { email: email, contents: contents, name: name },
-  };
+const inputFields = [
+  { type: 'text', name: 'name', placeholder: 'お名前' },
+  { type: 'email', name: 'email', placeholder: 'メールアドレス' },
+];
 
-  // fetch関数の戻り値をawaitするか、.thenで処理する
+async function fetchWithUUID(
+  endpoint: string,
+  method: string,
+  UUID?: string,
+  ip?: string,
+): Promise<{ success: boolean; clientIp: string }> {
+  try {
+    const response = await fetch(`/api/${endpoint}${UUID ? `?UUID=${UUID}` : ''}`, {
+      method: method,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      ...(method === 'POST'
+        ? { body: JSON.stringify(UUID ? (ip && UUID ? { UUID, ip } : { UUID }) : {}) }
+        : {}),
+    });
+    if (response.ok) {
+      const data = (await response.json()) as { success: boolean; clientIp: string };
+      return data;
+    } else {
+      return { success: false, clientIp: '' };
+    }
+  } catch (error) {
+    console.error('Error fetching data:', error);
+    return { success: false, clientIp: '' };
+  }
+}
 
-  fetch("/api/contact", {
-    method: "POST",
-    mode: "same-origin",
-
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ name: name, email: email, contents: contents }),
-  })
-    .then((response) => {
-      console.log("res");
-      if (response.ok) {
-        response
-          .json()
-          .then((value: { success: boolean }) => {
-            return_success = value.success;
-            console.log("return_success");
-            console.log(return_success);
-            return_map.return_success = return_success;
-            return_map.response_status = response.status;
-          })
-          .catch((error) => {
-            throw error;
-          });
-      } else {
-        return_map.response_status = response.status;
-      }
-
-      // 応答を処理する
-    })
-    .catch((error) => {
-      () => {};
-      console.log(error);
+async function emailContact(
+  name: string,
+  email: string,
+  contents: string,
+  uuid: string,
+  ip: string,
+): Promise<MailResType> {
+  try {
+    const response = await fetch('/api/contact', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ name, email, contents, uuid, ip }),
     });
 
-  console.log(return_map.return_success);
-  return return_map;
-}
-
-async function getIp(): Promise<{
-  success: boolean;
-  clientIp: string;
-}> {
-  let return_response: { success: boolean; clientIp: string } = {
-    success: false,
-    clientIp: "",
-  };
-  try {
-    return_response = ((await axios.get("/api/getIp")).data as {
-      success: boolean;
-      clientIp: string;
-    }) || { success: false, clientIp: "" };
+    if (response.ok) {
+      const data = (await response.json()) as { success: boolean };
+      return {
+        return_success: data.success,
+        response_status: response.status,
+        params: { email, name, contents },
+      };
+    } else {
+      return {
+        return_success: false,
+        response_status: response.status,
+        params: { email, name, contents },
+      };
+    }
   } catch (error) {
-    console.log("thi is error");
-    console.log(error);
-    console.log("end error");
+    console.error('Error sending contact form:', error);
+    return { return_success: false, response_status: 0, params: { email, name, contents } };
   }
-  return return_response;
-}
-
-function setIp(
-  IpMap: Promise<{
-    success: boolean;
-    clientIp: string;
-  }>,
-  UUID: string,
-) {
-  let returnBoolean = false;
-  IpMap.then((ipMap) => {
-    fetch("/api/setData", {
-      method: "POST",
-      mode: "same-origin",
-
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        UUID: UUID,
-        ip: ipMap.success ? "" : ipMap.clientIp,
-      }),
-    })
-      .then((value) => {
-        if (value.ok) {
-          value
-            .json()
-            .then((response: { success: boolean }) => {
-              returnBoolean = response.success;
-            })
-            .catch((rew_error) => {
-              throw rew_error;
-            });
-        }
-      })
-      .catch((error) => {
-        throw error;
-      });
-  }).catch((error) => {
-    throw error;
-  });
-  return returnBoolean;
 }
 
 export default function Page({ searchParams: { UUID } }: { searchParams: { UUID: string } }) {
-  //const router = useRouter();
-  console.log("UUID" + UUID);
-  console.log("ip\n");
-  const Data_getIp = { clientIp: "", success: false };
-  const PromiseIP = getIp();
-  setIp(PromiseIP, UUID);
+  const [isValid, setIsValid] = useState(false);
+  const [uuid, setUUID] = useState('');
+  const [ip, setIp] = useState('');
 
-  console.log("endi\n");
-  const clickSubmit = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault(); //ページのリロードを防ぐ
+  useEffect(() => {
+    const validateUUID = async () => {
+      try {
+        if (
+          UUID &&
+          Boolean(
+            UUID.match(/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i),
+          )
+        ) {
+          // UUIDが存在する場合
+          const { success: successSearch, clientIp: ipSearched } = await fetchWithUUID(
+            'searchIP',
+            'GET',
+            UUID,
+          );
+          const { success: successGet, clientIp: ipGet } = await fetchWithUUID('onlyIP', 'GET');
+
+          if (successSearch && successGet && ipSearched === ipGet) {
+            setUUID(UUID);
+            setIp(ipGet);
+            setIsValid(true);
+          } else {
+            setIsValid(false);
+          }
+        } else {
+          // UUIDが存在しない場合
+          const newUUID = generateUUIDv4();
+          const { success, clientIp } = await fetchWithUUID('onlyIP', 'GET');
+          if (success && clientIp) {
+            await fetchWithUUID('setData', 'POST', newUUID, clientIp);
+            setUUID(newUUID);
+            setIp(clientIp);
+            setIsValid(true);
+            redirect(`/contact?UUID=${newUUID}`);
+          } else {
+            setIsValid(false);
+          }
+        }
+      } catch (error) {
+        console.error('Error validating UUID:', error);
+        setIsValid(false);
+      }
+    };
+
+    void validateUUID();
+  }, [UUID]);
+
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
+    e.preventDefault();
     const formData = new FormData(e.currentTarget);
-    const res_result = emailContact(formData);
-    //const params = new URLSearchParams(res_result.params).toString();
-    if (res_result.return_success) {
-      //router.replace(`/contact/success?${params}`);
-    } else {
-      //router.replace(`contact/failure?${params}`);
+    const name = escapeHTML((formData.get('name') as string) || '');
+    const email = escapeHTML((formData.get('email') as string) || '').replace(/\s+/g, '');
+    const contents = escapeHTML((formData.get('contents') as string) || '');
+    const useUUID = escapeHTML(uuid);
+    const useIP = escapeHTML(ip);
+
+    try {
+      const result = await emailContact(name, email, contents, useUUID, useIP);
+      if (result.return_success) {
+        // router.replace(`/contact/success`);
+      } else {
+        // router.replace(`/contact/failure`);
+      }
+    } catch (error) {
+      console.error('Error submitting contact form:', error);
     }
   };
 
-  return (
+  return isValid ? (
     <>
       <Header />
       <main>
         <section className="mx-auto flex h-screen w-4/5 flex-col content-center items-center justify-center pt-[86px] md:flex-row md:justify-around">
-          <form onSubmit={clickSubmit}>
-            <ul>
-              <li>
-                <ul>
-                  <li>
-                    <ul>
-                      <li>
-                        <input
-                          type="text"
-                          name="name"
-                          id="name"
-                          className="bg-red-50"
-                          placeholder="お名前"
-                        />
-                      </li>
-                      <li>
-                        <input
-                          type="email"
-                          name="email"
-                          id="email"
-                          className="bg-red-50"
-                          placeholder="メールアドレス"
-                        />
-                      </li>
-                    </ul>
-                  </li>
-                  <li>
-                    <textarea
-                      name="contents"
-                      id="contents"
-                      cols={30}
-                      rows={10}
-                      className="bg-red-50"
-                      placeholder="お問い合わせ内容"
-                    />
-                  </li>
-                </ul>
-              </li>
-              <li>
-                <button type="submit">送信</button>
-              </li>
-            </ul>
+          {/* eslint-disable-next-line @typescript-eslint/no-misused-promises */}
+          <form onSubmit={handleSubmit}>
+            {inputFields.map(({ type, name, placeholder }) => (
+              <input
+                key={name}
+                type={type}
+                name={name}
+                placeholder={placeholder}
+                className="mb-2 bg-red-50"
+              />
+            ))}
+            <textarea
+              name="contents"
+              placeholder="お問い合わせ内容"
+              rows={5}
+              className="mb-2 bg-red-50"
+            />
+            <button type="submit" className="rounded bg-blue-500 px-4 py-2 text-white">
+              送信
+            </button>
           </form>
         </section>
       </main>
       <Footer />
     </>
+  ) : (
+    <div>Loading...</div>
   );
 }

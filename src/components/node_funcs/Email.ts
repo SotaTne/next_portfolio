@@ -1,5 +1,5 @@
-import { createTransport, Transporter } from "nodemailer";
-import SMTPTransport from "nodemailer/lib/smtp-transport";
+import { createTransport, Transporter } from 'nodemailer';
+import SMTPTransport from 'nodemailer/lib/smtp-transport';
 
 async function sendMain(
   mailContents: {
@@ -23,11 +23,11 @@ export async function SendEMail(props: { fromMail: string; name: string; content
   const fromMail = props.fromMail;
   const name = props.name;
   const mail = process.env.SEND_GMAIL_ADDRESS;
-  const pass = process.env.APP_PASS;
+  const pass = process.env.MAIL_APP_PASS;
   const receive_mail = process.env.RECEIVE_ADDRESS;
 
   const transport = createTransport({
-    service: "Gmail",
+    service: 'Gmail',
     auth: {
       user: mail,
       pass: pass,

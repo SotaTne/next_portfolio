@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "es5",
+    "target": "es2017",
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": false,
     "skipLibCheck": true,
@@ -34,7 +34,9 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "src/app/contact/failure/page.tsx"
-, "src/middleware.js"  ],
+    "src/app/contact/failure/page.tsx",
+    "src/middleware.js",
+    "src/app/api/firebase/route.mjs"
+  ],
   "exclude": ["node_modules"]
 }

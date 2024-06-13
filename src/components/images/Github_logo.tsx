@@ -8,9 +8,9 @@ export default function Github_Logo(props: {
       role="img"
       aria-label="Instagram_logo"
       viewBox="0 0 98 96"
-      fill={"string" === typeof props.color ? props.color : "black"}
-      height={"number" === typeof props.size ? props.size : 24}
-      width={"number" === typeof props.size ? props.size : 24}
+      fill={'string' === typeof props.color ? props.color : 'black'}
+      height={'number' === typeof props.size ? props.size : 24}
+      width={'number' === typeof props.size ? props.size : 24}
     >
       <path
         fillRule="evenodd"

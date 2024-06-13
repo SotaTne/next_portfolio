@@ -9,5 +9,20 @@
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
     "project": "./tsconfig.json"
-  }
+  },
+  "overrides": [
+    {
+      "files": ["src/**/*.ts"],
+      "rules": {
+        "semi": "warn",
+        "@typescript-eslint/consistent-type-assertions": "error",
+        "@typescript-eslint/no-unused-vars": "warn",
+        "@typescript-eslint/ban-types": "error",
+        "@typescript-eslint/no-explicit-any": "warn",
+        "@typescript-eslint/strict-boolean-expressions": "warn",
+        "no-implicit-coercion": "error",
+        "@typescript-eslint/naming-convention": "off"
+      }
+    }
+  ]
 }

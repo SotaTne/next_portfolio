@@ -9,5 +9,5 @@
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "editor.tabSize": 2,
   "editor.insertSpaces": true,
-  "cSpell.words": ["clsx", "sota", "tsunemine"]
+  "cSpell.words": ["clsx", "Firestore", "sota", "tsunemine"]
 }
