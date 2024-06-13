@@ -119,6 +119,15 @@ export default function Page({ searchParams: { UUID } }: { searchParams: { UUID:
           // UUIDが存在しない場合
           const newUUID = generateUUIDv4();
           const { success, clientIp } = await fetchWithUUID('setData', 'POST', newUUID);
+          fetchWithUUID('setData', 'POST', newUUID)
+            .then((value) => {
+              console.log(value);
+              console.log('fetched');
+            })
+            .catch((error) => {
+              console.log(error);
+            });
+
           console.log(`url:${url()}`);
           console.log('success:' + success);
           console.log('clientIP:' + clientIp);
