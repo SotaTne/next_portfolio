@@ -118,19 +118,14 @@ export default function Page({ searchParams: { UUID } }: { searchParams: { UUID:
         } else {
           // UUIDが存在しない場合
           const newUUID = generateUUIDv4();
-          const { success, clientIp } = await fetchWithUUID('setData', 'POST', newUUID);
-
-          console.log(`url:${url()}`);
-          console.log('success:' + success);
-          console.log('clientIP:' + clientIp);
+          const { success, clientIp } = await fetchWithUUID('onlyIP', 'GET');
           if (success && clientIp) {
-            console.log('ok');
+            await fetchWithUUID('setData', 'POST', newUUID, clientIp);
             setUUID(newUUID);
             setIp(clientIp);
             setIsValid(true);
-            setNeedRedirect(true);
+            redirect(`/contact?UUID=${newUUID}`);
           } else {
-            console.log('not ok');
             setIsValid(false);
           }
         }
