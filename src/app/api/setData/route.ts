@@ -23,11 +23,19 @@ export async function POST(req: NextRequest) {
       return xRealIp;
     }
 
-    // 追加のヘッダーをチェック（例：fastly-client-ip）
+    // fastly-client-ipヘッダーの値を取得
     const fastlyClientIp = req.headers.get('fastly-client-ip');
     if (fastlyClientIp != null) {
       return fastlyClientIp;
     }
+
+    // cf-connecting-ipヘッダーの値を取得（Cloudflare）
+    const cfConnectingIp = req.headers.get('cf-connecting-ip');
+    if (cfConnectingIp != null) {
+      return cfConnectingIp;
+    }
+
+    // その他のカスタムヘッダーを追加する場合はこちらに記述
 
     // req.ipはサーバーレス環境では信頼できないことが多い
     return null;
@@ -69,8 +77,7 @@ async function setIP(uuid: string, ip: string): Promise<{ success: boolean; clie
     });
     if (response.ok) {
       const data = (await response.json()) as { success: boolean };
-      const success = data.success;
-      returnJson = { success: success, clientIp: ip };
+      returnJson = { success: data.success, clientIp: ip };
     }
   } catch (error) {
     console.error('Error fetching data:', error);
