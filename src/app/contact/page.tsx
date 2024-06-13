@@ -110,7 +110,7 @@ export default function Page({ searchParams: { UUID } }: { searchParams: { UUID:
 
           if (successSearch && successGet && ipSearched === ipGet) {
             setUUID(UUID);
-            setIp(ipGet);
+            setIp(ipSearched);
             setIsValid(true);
           } else {
             setIsValid(false);
@@ -121,10 +121,9 @@ export default function Page({ searchParams: { UUID } }: { searchParams: { UUID:
           const { success, clientIp } = await fetchWithUUID('onlyIP', 'GET');
           if (success && clientIp) {
             await fetchWithUUID('setData', 'POST', newUUID, clientIp);
+            setIsValid(false);
+            setNeedRedirect(true);
             setUUID(newUUID);
-            setIp(clientIp);
-            setIsValid(true);
-            //redirect(`/contact?UUID=${newUUID}`);
           } else {
             setIsValid(false);
           }
@@ -138,12 +137,12 @@ export default function Page({ searchParams: { UUID } }: { searchParams: { UUID:
     void validateUUID();
   }, [UUID]);
   useEffect(() => {
-    if (isValid && uuid && needRedirect) {
+    if (uuid && needRedirect) {
       console.log('redirect');
       setNeedRedirect(false);
       redirect(`/contact?UUID=${uuid}`);
     }
-  }, [isValid, uuid, needRedirect]);
+  }, [uuid, needRedirect]);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
