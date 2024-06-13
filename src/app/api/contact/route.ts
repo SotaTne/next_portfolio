@@ -1,4 +1,5 @@
 import { escapeHTML } from '@/components/funcs/Translator';
+import url from '@/components/funcs/api_baseURL';
 import { SendEMail } from '@/components/node_funcs/Email';
 
 type ResData = { name: string; email: string; contents: string; uuid: string; ip: string };
@@ -87,7 +88,7 @@ async function setEmail(
 ): Promise<{ success: boolean }> {
   let returnJson = { success: false };
   try {
-    const response = await fetch('/api/firebase/setEmail', {
+    const response = await fetch(`${url}/api/firebase/setEmail`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

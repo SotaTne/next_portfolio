@@ -1,3 +1,5 @@
+import url from '@/components/funcs/api_baseURL';
+
 type ResData = { UUID: string; ip: string };
 
 export async function POST(req: Request) {
@@ -28,7 +30,7 @@ export async function POST(req: Request) {
 async function setIP(uuid: string, ip: string): Promise<{ success: boolean; clientIp: string }> {
   let returnJson = { success: false, clientIp: '' };
   try {
-    const response = await fetch('/api/firebase/setIP', {
+    const response = await fetch(`${url}/api/firebase/setIP`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

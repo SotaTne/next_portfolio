@@ -1,3 +1,5 @@
+import url from '@/components/funcs/api_baseURL';
+
 export async function GET(req: Request) {
   const url = new URL(req.url);
   const UUID = url.searchParams.get('UUID');
@@ -40,7 +42,7 @@ async function searchData(uuid: string): Promise<{ success: boolean; clientIp: s
   let returnJson = { success: false, clientIp: '' };
 
   try {
-    const response = await fetch(`/api/firebase/searchData?UUID=${uuid}`, {
+    const response = await fetch(`${url}/api/firebase/searchData?UUID=${uuid}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',

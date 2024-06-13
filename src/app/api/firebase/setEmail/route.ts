@@ -1,4 +1,5 @@
 import { escapeHTML } from '@/components/funcs/Translator';
+import url from '@/components/funcs/api_baseURL';
 import db from '../base';
 
 const setData = async (name: string, email: string, contents: string, uuid: string, ip: string) => {
@@ -44,7 +45,7 @@ export async function POST(req: Request) {
 async function deleteData(uuid: string): Promise<{ success: boolean }> {
   let returnJson = { success: false };
   try {
-    const response = await fetch('/api/firebase/deleteData', {
+    const response = await fetch(`${url}/api/firebase/deleteData`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
