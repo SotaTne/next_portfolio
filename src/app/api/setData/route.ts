@@ -45,6 +45,12 @@ export async function POST(req: NextRequest) {
       console.error('Error fetching data:', error);
       return NextResponse.json({ success: false, error: 'Internal Server Error' }, { status: 500 });
     }
+  } else {
+    // クライアントのIPアドレスが取得できない場合はエラーログを記録
+    console.error('Unable to determine client IP address:', {
+      headers: req.headers,
+      ip: req.ip,
+    });
   }
 
   return NextResponse.json(returnJson);
