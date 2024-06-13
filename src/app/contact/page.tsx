@@ -124,7 +124,7 @@ export default function Page({ searchParams: { UUID } }: { searchParams: { UUID:
             setUUID(newUUID);
             setIp(clientIp);
             setIsValid(true);
-            redirect(`/contact?UUID=${newUUID}`);
+            //redirect(`/contact?UUID=${newUUID}`);
           } else {
             setIsValid(false);
           }
