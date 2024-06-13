@@ -119,7 +119,7 @@ export default function Page({ searchParams: { UUID } }: { searchParams: { UUID:
           // UUIDが存在しない場合
           const newUUID = generateUUIDv4();
           const { success, clientIp } = await fetchWithUUID('setData', 'POST', newUUID);
-          console.log(`url:${url}`);
+          console.log(`url:${url()}`);
           console.log('success:' + success);
           console.log('clientIP:' + clientIp);
           if (success && clientIp) {
@@ -161,9 +161,9 @@ export default function Page({ searchParams: { UUID } }: { searchParams: { UUID:
     try {
       const result = await emailContact(name, email, contents, useUUID, useIP);
       if (result.return_success) {
-        router.push(`${url}/contact/success`);
+        router.push(`${url()}/contact/success`);
       } else {
-        router.push(`${url}/contact/failure`);
+        router.push(`${url()}/contact/failure`);
       }
     } catch (error) {
       console.error('Error submitting contact form:', error);

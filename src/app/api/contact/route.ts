@@ -96,7 +96,7 @@ async function setEmail(
 ): Promise<{ success: boolean }> {
   let returnJson = { success: false };
   try {
-    const response = await fetch(`${url}/api/firebase/setEmail`, {
+    const response = await fetch(`${url()}/api/firebase/setEmail`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -118,7 +118,7 @@ async function searchData(uuid: string): Promise<{ success: boolean; clientIp: s
   let returnJson = { success: false, clientIp: '' };
 
   try {
-    const response = await fetch(`${url}/api/firebase/searchData?UUID=${uuid}`, {
+    const response = await fetch(`${url()}/api/firebase/searchData?UUID=${uuid}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -141,7 +141,7 @@ async function searchData(uuid: string): Promise<{ success: boolean; clientIp: s
 async function deleteData(uuid: string): Promise<{ success: boolean }> {
   let returnJson = { success: false };
   try {
-    const response = await fetch(`${url}/api/firebase/deleteData`, {
+    const response = await fetch(`${url()}/api/firebase/deleteData`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
