@@ -1,5 +1,4 @@
 // searchData/route.ts
-import { escapeHTML } from '@/components/funcs/Translator';
 import db from '../base';
 
 type SearchDataResponse = { success: boolean; clientIp: string };
@@ -26,17 +25,16 @@ const searchData = async (uuid: string): Promise<SearchDataResponse> => {
   return returnJson;
 };
 
-type ResData = { UUID: string };
-
-export async function POST(req: Request) {
+export async function GET(req: Request) {
   let returnJson: SearchDataResponse = { success: false, clientIp: '' };
-  const data: ResData = (await req.json()) as ResData;
-  const uuid: string = escapeHTML(data.UUID || '');
-
-  try {
-    returnJson = await searchData(uuid);
-  } catch (e) {
-    console.error('Error searching data:', e);
+  const url = new URL(req.url);
+  const uuid = url.searchParams.get('UUID');
+  if (uuid != null) {
+    try {
+      returnJson = await searchData(uuid);
+    } catch (e) {
+      console.error('Error searching data:', e);
+    }
   }
 
   return Response.json(returnJson);

@@ -3,8 +3,9 @@
 import Footer from '@/components/Footer';
 import Header from '@/components/Header';
 import { escapeHTML } from '@/components/funcs/Translator';
+import url from '@/components/funcs/api_baseURL';
 import { generateUUIDv4 } from '@/components/funcs/uuid';
-import { redirect } from 'next/navigation';
+import { redirect, useRouter } from 'next/navigation';
 import { FormEvent, useEffect, useState } from 'react';
 
 type MailResType = {
@@ -83,9 +84,12 @@ async function emailContact(
 }
 
 export default function Page({ searchParams: { UUID } }: { searchParams: { UUID: string } }) {
+  const router = useRouter();
+
   const [isValid, setIsValid] = useState(false);
   const [uuid, setUUID] = useState('');
   const [ip, setIp] = useState('');
+  const [needRedirect, setNeedRedirect] = useState(false);
 
   useEffect(() => {
     const validateUUID = async () => {
@@ -114,14 +118,17 @@ export default function Page({ searchParams: { UUID } }: { searchParams: { UUID:
         } else {
           // UUIDが存在しない場合
           const newUUID = generateUUIDv4();
-          const { success, clientIp } = await fetchWithUUID('onlyIP', 'GET');
+          const { success, clientIp } = await fetchWithUUID('setData', 'POST', newUUID);
+          console.log('success:' + success);
+          console.log('clientIP:' + clientIp);
           if (success && clientIp) {
-            await fetchWithUUID('setData', 'POST', newUUID, clientIp);
+            console.log('ok');
             setUUID(newUUID);
             setIp(clientIp);
             setIsValid(true);
-            redirect(`/contact?UUID=${newUUID}`);
+            setNeedRedirect(true);
           } else {
+            console.log('not ok');
             setIsValid(false);
           }
         }
@@ -133,6 +140,13 @@ export default function Page({ searchParams: { UUID } }: { searchParams: { UUID:
 
     void validateUUID();
   }, [UUID]);
+  useEffect(() => {
+    if (isValid && uuid && needRedirect) {
+      console.log('redirect');
+      setNeedRedirect(false);
+      redirect(`/contact?UUID=${uuid}`);
+    }
+  }, [isValid, uuid, needRedirect]);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
@@ -146,9 +160,9 @@ export default function Page({ searchParams: { UUID } }: { searchParams: { UUID:
     try {
       const result = await emailContact(name, email, contents, useUUID, useIP);
       if (result.return_success) {
-        // router.replace(`/contact/success`);
+        router.push(`${url}/contact/success`);
       } else {
-        // router.replace(`/contact/failure`);
+        router.push(`${url}/contact/failure`);
       }
     } catch (error) {
       console.error('Error submitting contact form:', error);

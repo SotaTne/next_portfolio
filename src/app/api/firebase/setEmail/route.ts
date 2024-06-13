@@ -1,5 +1,4 @@
 import { escapeHTML } from '@/components/funcs/Translator';
-import url from '@/components/funcs/api_baseURL';
 import db from '../base';
 
 const setData = async (name: string, email: string, contents: string, uuid: string, ip: string) => {
@@ -31,33 +30,8 @@ export async function POST(req: Request) {
   const ip: string = escapeHTML(data.ip || '');
   try {
     returnJson = await setData(name, email, contents, uuid, ip);
-    try {
-      await deleteData(uuid);
-    } catch (e) {
-      console.error('Error setting data:', e);
-    }
   } catch (e) {
     console.error('Error setting data:', e);
   }
   return Response.json(returnJson);
-}
-
-async function deleteData(uuid: string): Promise<{ success: boolean }> {
-  let returnJson = { success: false };
-  try {
-    const response = await fetch(`${url}/api/firebase/deleteData`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ UUID: uuid }),
-    });
-    if (response.ok) {
-      const data = (await response.json()) as { success: boolean };
-      returnJson = data;
-    }
-  } catch (error) {
-    console.error('Error fetching data:', error);
-  }
-  return returnJson;
 }
