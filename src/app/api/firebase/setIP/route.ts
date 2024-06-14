@@ -3,7 +3,7 @@ import db from '../base';
 type SetDataResponse = { success: boolean };
 
 const setData = async (uuid: string, ip: string): Promise<SetDataResponse> => {
-  console.log('setIPFire');
+  console.log('setIPFire', { uuid, ip }); // デバッグログを追加
   const docRef = db.collection('uuidIpMap').doc(uuid);
   let returnJson: SetDataResponse = { success: false };
   try {
@@ -24,7 +24,7 @@ type ResData = {
   IP: string;
 };
 
-export async function POST(req: Request) {
+export async function POST(req: Request): Promise<Response> {
   let returnJson = { success: false };
   try {
     const data: ResData = (await req.json()) as ResData;
@@ -38,5 +38,10 @@ export async function POST(req: Request) {
       console.error('Unknown error setting data');
     }
   }
-  return Response.json(returnJson);
+  return new Response(JSON.stringify(returnJson), {
+    status: 200,
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
 }
