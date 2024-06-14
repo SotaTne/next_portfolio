@@ -3,7 +3,6 @@
 import Footer from '@/components/Footer';
 import Header from '@/components/Header';
 import { escapeHTML } from '@/components/funcs/Translator';
-import url from '@/components/funcs/api_baseURL';
 import { generateUUIDv4 } from '@/components/funcs/uuid';
 import { redirect, useRouter } from 'next/navigation';
 import { FormEvent, useEffect, useState } from 'react';
@@ -159,9 +158,9 @@ export default function Page({ searchParams: { UUID } }: { searchParams: { UUID:
     try {
       const result = await emailContact(name, email, contents, useUUID, useIP);
       if (result.return_success) {
-        router.push(`${url()}/contact/success`);
+        router.push(`/contact/success`);
       } else {
-        router.push(`${url()}/contact/failure`);
+        router.push(`/contact/failure`);
       }
     } catch (error) {
       console.error('Error submitting contact form:', error);

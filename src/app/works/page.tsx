@@ -1,6 +1,6 @@
-import Footer from "@/components/Footer";
-import Header from "@/components/Header";
-import My_Logo from "@/components/images/My_Logo";
+import Footer from '@/components/Footer';
+import Header from '@/components/Header';
+import My_Logo from '@/components/images/My_Logo';
 
 export default function Page() {
   return (
