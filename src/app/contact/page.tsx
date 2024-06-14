@@ -100,6 +100,7 @@ export default function Page({ searchParams: { UUID } }: { searchParams: { UUID:
             UUID.match(/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i),
           )
         ) {
+          console.log('hasUUID');
           // UUIDが存在する場合
           const { success: successSearch, clientIp: ipSearched } = await fetchWithUUID(
             'searchIP',
@@ -120,6 +121,7 @@ export default function Page({ searchParams: { UUID } }: { searchParams: { UUID:
           const newUUID = generateUUIDv4();
           const { success, clientIp } = await fetchWithUUID('onlyIP', 'GET');
           if (success && clientIp) {
+            console.log('start set');
             await fetchWithUUID('setData', 'POST', newUUID, clientIp);
             setIsValid(false);
             setNeedRedirect(true);
@@ -140,6 +142,7 @@ export default function Page({ searchParams: { UUID } }: { searchParams: { UUID:
     if (uuid && needRedirect) {
       console.log('redirect');
       setNeedRedirect(false);
+      setUUID('');
       redirect(`/contact?UUID=${uuid}`);
     }
   }, [uuid, needRedirect]);
