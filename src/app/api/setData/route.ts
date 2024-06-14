@@ -1,18 +1,9 @@
 import url from '@/components/funcs/api_baseURL';
-import db from '../firebase/base';
 
 type ResData = { UUID: string; ip: string };
 type SetIPResponse = { success: boolean; clientIp: string };
 
 export async function POST(req: Request): Promise<Response> {
-  console.log('API Endpoint Hit'); // デバッグログを追加
-  const ref = db.collection('test').doc('test');
-  try {
-    await ref.set({ go: 'name' });
-  } catch (error) {
-    console.error(error);
-  }
-
   try {
     const data: ResData = (await req.json()) as ResData;
     const { UUID, ip } = data;
@@ -26,7 +17,7 @@ export async function POST(req: Request): Promise<Response> {
 }
 
 async function saveClientIP(uuid: string, ip: string): Promise<SetIPResponse> {
-  console.log('Calling setIP API with:', { uuid, ip }); // デバッグログを追加
+  console.log('Calling setIP API with:', { uuid, ip });
   try {
     const response = await fetch(`${url()}/api/firebase/setIP`, {
       method: 'POST',
@@ -36,14 +27,15 @@ async function saveClientIP(uuid: string, ip: string): Promise<SetIPResponse> {
       body: JSON.stringify({ UUID: uuid, IP: ip }),
     });
 
-    console.log('Response status:', response.status); // デバッグログを追加
+    console.log('Response status:', response.status);
+    const responseText = await response.text(); // 追加：レスポンスの詳細をログに記録
+    console.log('Response text:', responseText);
 
     if (response.ok) {
       const data = (await response.json()) as { success: boolean };
-      console.log('Response data:', data); // デバッグログを追加
       return { success: data.success, clientIp: ip };
     } else {
-      logError('Error setting IP: Response not ok');
+      logError('Error setting IP: Response not ok', new Error(responseText));
       return { success: false, clientIp: '' };
     }
   } catch (error) {

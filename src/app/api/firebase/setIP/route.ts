@@ -37,9 +37,10 @@ export async function POST(req: Request): Promise<Response> {
     } else {
       console.error('Unknown error setting data');
     }
+    returnJson = { success: false }; // エラー発生時のレスポンス
   }
   return new Response(JSON.stringify(returnJson), {
-    status: 200,
+    status: returnJson.success ? 200 : 500, // 成功なら200、失敗なら500
     headers: {
       'Content-Type': 'application/json',
     },
