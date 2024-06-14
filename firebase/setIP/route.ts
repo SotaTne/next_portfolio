@@ -1,3 +1,4 @@
+/*
 import db from '../base';
 
 type SetDataResponse = { success: boolean };
@@ -46,3 +47,4 @@ export async function POST(req: Request): Promise<Response> {
     },
   });
 }
+*/

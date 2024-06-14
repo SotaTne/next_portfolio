@@ -1,3 +1,4 @@
+/*
 // deleteData/route.ts
 import { escapeHTML } from '@/components/funcs/Translator';
 import db from '../base';
@@ -33,3 +34,4 @@ export async function POST(req: Request) {
 
   return Response.json(returnJson);
 }
+*/

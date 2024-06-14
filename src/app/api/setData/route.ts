@@ -1,4 +1,4 @@
-import url from '@/components/funcs/api_baseURL';
+import setData from '@/components/firebase/setIP';
 
 type ResData = { UUID: string; ip: string };
 type SetIPResponse = { success: boolean; clientIp: string };
@@ -19,25 +19,7 @@ export async function POST(req: Request): Promise<Response> {
 async function saveClientIP(uuid: string, ip: string): Promise<SetIPResponse> {
   console.log('Calling setIP API with:', { uuid, ip });
   try {
-    const response = await fetch(`${url()}/api/firebase/setIP`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ UUID: uuid, IP: ip }),
-    });
-
-    console.log('Response status:', response.status);
-    const responseText = await response.text(); // 追加：レスポンスの詳細をログに記録
-    console.log('Response text:', responseText);
-
-    if (response.ok) {
-      const data = (await response.json()) as { success: boolean };
-      return { success: data.success, clientIp: ip };
-    } else {
-      logError('Error setting IP: Response not ok', new Error(responseText));
-      return { success: false, clientIp: '' };
-    }
+    return { success: (await setData(uuid, ip)).success, clientIp: 'ok' };
   } catch (error) {
     logError('Error setting IP', error);
     return { success: false, clientIp: '' };

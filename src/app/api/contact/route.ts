@@ -1,5 +1,7 @@
+import deleteIpData from '@/components/firebase/deleteData';
+import searchIpData from '@/components/firebase/search';
+import setData from '@/components/firebase/setEmail';
 import { escapeHTML } from '@/components/funcs/Translator';
-import url from '@/components/funcs/api_baseURL';
 import { SendEMail } from '@/components/node_funcs/Email';
 
 type ResData = { name: string; email: string; contents: string; uuid: string; ip: string };
@@ -96,18 +98,7 @@ async function setEmail(
 ): Promise<{ success: boolean }> {
   let returnJson = { success: false };
   try {
-    const response = await fetch(`${url()}/api/firebase/setEmail`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ name: name, email: email, contents: contents, uuid: uuid, ip: ip }),
-    });
-    if (response.ok) {
-      returnJson = (await response.json()) as {
-        success: boolean;
-      };
-    }
+    returnJson = await setData(name, email, contents, uuid, ip);
   } catch (error) {
     console.error('Error fetching data:', error);
   }
@@ -118,19 +109,7 @@ async function searchData(uuid: string): Promise<{ success: boolean; clientIp: s
   let returnJson = { success: false, clientIp: '' };
 
   try {
-    const response = await fetch(`${url()}/api/firebase/searchData?UUID=${uuid}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-
-    if (response.ok) {
-      const data = (await response.json()) as { success: boolean; clientIp: string };
-      returnJson = data;
-    } else {
-      console.error('Failed to fetch data:', response.statusText);
-    }
+    returnJson = await searchIpData(uuid);
   } catch (error) {
     console.error('Error fetching data:', error);
   }
@@ -141,17 +120,7 @@ async function searchData(uuid: string): Promise<{ success: boolean; clientIp: s
 async function deleteData(uuid: string): Promise<{ success: boolean }> {
   let returnJson = { success: false };
   try {
-    const response = await fetch(`${url()}/api/firebase/deleteData`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ UUID: uuid }),
-    });
-    if (response.ok) {
-      const data = (await response.json()) as { success: boolean };
-      returnJson = data;
-    }
+    returnJson = await deleteIpData(uuid);
   } catch (error) {
     console.error('Error fetching data:', error);
   }

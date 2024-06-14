@@ -9,7 +9,7 @@ export default function url() {
       ? process.env.NEXT_PUBLIC_VERCEL_URL
       : 'localhost:3000';
 
-  if (!isProduction && domain === 'localhost:3000') {
+  if (!isProduction && domain == 'localhost:3000') {
     return `${protocol}://${domain}`;
   }
 

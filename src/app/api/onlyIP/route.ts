@@ -5,8 +5,20 @@ export function GET(req: NextRequest) {
 
   // クライアントのIPアドレスを取得する関数
   const getClientIp = (req: NextRequest): string | null => {
+    const headers = req.headers;
+
+    // Cloudflareの場合
+    const cfConnectingIP = headers.get('cf-connecting-ip');
+    if (cfConnectingIP != null) {
+      return cfConnectingIP;
+    }
+
+    const trueClientIP = headers.get('true-client-ip');
+    if (trueClientIP != null) {
+      return trueClientIP;
+    }
     // x-forwarded-forヘッダーの値を取得
-    const xForwardedFor = req.headers.get('x-forwarded-for');
+    const xForwardedFor = headers.get('x-forwarded-for');
     if (xForwardedFor != null) {
       const forwardedForArray = xForwardedFor.split(',');
       if (forwardedForArray.length > 0 && forwardedForArray[0] != null) {
@@ -15,16 +27,22 @@ export function GET(req: NextRequest) {
     }
 
     // x-real-ipヘッダーの値を取得
-    const xRealIp = req.headers.get('x-real-ip');
+    const xRealIp = headers.get('x-real-ip');
     if (xRealIp != null) {
       return xRealIp;
     }
 
     // 追加のヘッダーをチェック（例：fastly-client-ip）
-    const fastlyClientIp = req.headers.get('fastly-client-ip');
+    const fastlyClientIp = headers.get('fastly-client-ip');
     if (fastlyClientIp != null) {
       return fastlyClientIp;
     }
+    /*
+    const remoteAddr = req.socket.remoteAddress;
+    if (remoteAddr) {
+      return remoteAddr;
+    }
+    */
 
     // req.ipはサーバーレス環境では信頼できないことが多い
     return null;
