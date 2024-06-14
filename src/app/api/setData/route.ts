@@ -1,10 +1,18 @@
 import url from '@/components/funcs/api_baseURL';
+import db from '../firebase/base';
 
 type ResData = { UUID: string; ip: string };
 type SetIPResponse = { success: boolean; clientIp: string };
 
 export async function POST(req: Request): Promise<Response> {
   console.log('API Endpoint Hit'); // デバッグログを追加
+  const ref = db.collection('test').doc('test');
+  try {
+    await ref.set({ go: 'name' });
+  } catch (error) {
+    console.error(error);
+  }
+
   try {
     const data: ResData = (await req.json()) as ResData;
     const { UUID, ip } = data;
