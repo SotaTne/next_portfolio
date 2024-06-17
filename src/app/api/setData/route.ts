@@ -8,8 +8,18 @@ type SetIPResponse = { success: boolean; clientIp: string };
 
 export async function POST(req: NextRequest): Promise<NextResponse> {
   const referer = req.headers.get('referer');
-  const origin = req.headers.get('origin');
+  let origin = req.headers.get('origin');
   let isRefererValid = false;
+
+  // Originがnullの場合、refererから取得
+  if (origin === null && referer !== null) {
+    try {
+      const refererUrl = new URL(referer);
+      origin = refererUrl.origin;
+    } catch (error) {
+      console.error('Error parsing referer URL:', error);
+    }
+  }
 
   if (referer != null && origin != null) {
     const refererUrl = new URL(referer);

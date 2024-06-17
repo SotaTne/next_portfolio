@@ -5,18 +5,30 @@ export async function GET(req: Request) {
   const url = new URL(req.url);
   const UUID = url.searchParams.get('UUID');
   const referer = req.headers.get('referer');
-  const origin = req.headers.get('origin');
+  let origin = req.headers.get('origin');
   let isRefererValid = false;
+
+  // Originがnullの場合、refererから取得
+  if (origin === null && referer !== null) {
+    try {
+      const refererUrl = new URL(referer);
+      origin = refererUrl.origin;
+    } catch (error) {
+      console.error('Error parsing referer URL:', error);
+    }
+  }
 
   if (referer != null && origin != null) {
     const refererUrl = new URL(referer);
     const refererBasePath = refererUrl.pathname;
     isRefererValid = origin + refererBasePath === `${origin}/contact`;
   }
-
+  console.log(referer);
+  console.log(origin);
   let returnJson = { success: false, clientIp: '' };
-
-  if (UUID == null || !isRefererValid || validateUUID(UUID)) {
+  console.log(validateUUID(UUID as string));
+  console.log(isRefererValid);
+  if (UUID == null || !isRefererValid || !validateUUID(UUID)) {
     return new Response(JSON.stringify({ success: false, error: 'UUID is missing' }), {
       status: 400,
       headers: {

@@ -4,8 +4,19 @@ import { NextRequest, NextResponse } from 'next/server';
 export function GET(req: NextRequest) {
   let returnJson = { success: false, clientIp: '' };
   const referer = req.headers.get('referer');
-  const origin = req.headers.get('origin');
+  let origin = req.headers.get('origin');
   let isRefererValid = false;
+  console.log(origin);
+
+  // Originがnullの場合、refererから取得
+  if (origin === null && referer !== null) {
+    try {
+      const refererUrl = new URL(referer);
+      origin = refererUrl.origin;
+    } catch (error) {
+      console.error('Error parsing referer URL:', error);
+    }
+  }
 
   if (referer != null && origin != null) {
     const refererUrl = new URL(referer);
