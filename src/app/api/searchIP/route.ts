@@ -1,12 +1,22 @@
 import searchIpData from '@/components/firebase/search';
+import { isIpAddress, validateUUID } from '@/components/funcs/matcher';
 
 export async function GET(req: Request) {
   const url = new URL(req.url);
   const UUID = url.searchParams.get('UUID');
+  const referer = req.headers.get('referer');
+  const origin = req.headers.get('origin');
+  let isRefererValid = false;
+
+  if (referer != null && origin != null) {
+    const refererUrl = new URL(referer);
+    const refererBasePath = refererUrl.pathname;
+    isRefererValid = origin + refererBasePath === `${origin}/contact`;
+  }
 
   let returnJson = { success: false, clientIp: '' };
 
-  if (UUID == null) {
+  if (UUID == null || !isRefererValid || validateUUID(UUID)) {
     return new Response(JSON.stringify({ success: false, error: 'UUID is missing' }), {
       status: 400,
       headers: {
@@ -17,7 +27,7 @@ export async function GET(req: Request) {
 
   try {
     const searchedData = await searchData(UUID);
-    if (searchedData.success) {
+    if (searchedData.success && isIpAddress(searchedData.clientIp)) {
       returnJson = { success: true, clientIp: searchedData.clientIp };
     }
   } catch (error) {
